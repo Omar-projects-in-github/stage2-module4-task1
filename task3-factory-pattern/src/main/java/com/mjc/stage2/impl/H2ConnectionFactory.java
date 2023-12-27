@@ -2,15 +2,14 @@ package com.mjc.stage2.impl;
 
 import com.mjc.stage2.ConnectionFactory;
 
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
 public class H2ConnectionFactory implements ConnectionFactory {
-    private static final String PROPERTIES_FILE_PATH = "task3-factory-pattern/src/main/resources/h2database.properties";
 
     @Override
     public Connection createConnection() {
@@ -31,8 +30,10 @@ public class H2ConnectionFactory implements ConnectionFactory {
 
     private Properties loadProperties() {
         Properties properties = new Properties();
-        try (FileInputStream fis = new FileInputStream(PROPERTIES_FILE_PATH)) {
-            properties.load(fis);
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("h2database.properties")) {
+            if (inputStream == null)
+                throw new RuntimeException("Properties file not found in classpath");
+            properties.load(inputStream);
         } catch (IOException exception) {
             throw new RuntimeException("Error while loading the properties file", exception);
         }
@@ -48,4 +49,3 @@ public class H2ConnectionFactory implements ConnectionFactory {
         }
     }
 }
-
